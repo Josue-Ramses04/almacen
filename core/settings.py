@@ -34,8 +34,7 @@ SECRET_KEY = 'django-insecure-c8jenlwr+q^zjc#c^5f@z5aklwoh-%pt)i1mwkwwnzx0#m62o=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS=['localhost', 'almacen-production-b1b7.up.railway.app']
 
 JAZZMIN_SETTINGS = {
     
@@ -165,3 +164,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
