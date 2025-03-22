@@ -91,6 +91,7 @@ def signup(request):
 
     return render(request, 'signup.html')
 
+
 # logout
 @login_required
 def logout_view(request):
@@ -122,16 +123,17 @@ def access_denied(request):
 
 
 #errores
-@login_required
+
+
 def error_404(request, exception):
     return render(request, '404.html', status=404)
-@login_required
+
 def error_502(request):
     return render(request, '502.html', status=502)
-@login_required
+
 def error_505(request):
     return render(request, '505.html', status=505)
-@login_required
+
 #Error 403
 def error403(request):
     return render(request, "403.html", status=403)
