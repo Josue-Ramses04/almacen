@@ -5,8 +5,10 @@ cloudinary==1.43.0
 dj-database-url==2.3.0
 Django==5.1.6
 django-admin-soft-dashboard==1.0.24
+django-axes==7.0.2
 django-cloudinary-storage==0.3.0
 django-jazzmin==3.0.1
+django-otp==1.5.4
 gunicorn==23.0.0
 idna==3.10
 mysql-connector-python==9.2.0
