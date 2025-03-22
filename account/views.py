@@ -122,16 +122,16 @@ def access_denied(request):
 
 
 #errores
-
+@login_required
 def error_404(request, exception):
     return render(request, '404.html', status=404)
-
+@login_required
 def error_502(request):
     return render(request, '502.html', status=502)
-
+@login_required
 def error_505(request):
     return render(request, '505.html', status=505)
-
+@login_required
 #Error 403
 def error403(request):
     return render(request, "403.html", status=403)
@@ -142,7 +142,7 @@ def error403(request):
 
 
 
-
+@login_required
 def profile(request):
     return render(request, 'profile.html')
 
@@ -159,7 +159,7 @@ def manage_product(request):
 
 
 
-
+@login_required
 def product_list(request):
     products = Product.objects.all()
     return render(request, 'product.html' , {'products': products})
@@ -168,7 +168,7 @@ def product_list(request):
 
 
 
-
+@login_required
 def create_product(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -202,7 +202,7 @@ def create_product(request):
 
 
 
-
+@login_required
 def edit_product(request, product_id):
     product = get_object_or_404(Product, id=product_id, user=request.user)  # Ensure the product belongs to the user
 
@@ -241,7 +241,7 @@ def delete_product(request, product_id):
  
  
  
- 
+@login_required 
 def product_details(request):
     products = Product.objects.all()
     return render(request, 'product_details.html', {'products': products})
