@@ -4,15 +4,14 @@
 {% block title %}Product Details{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/card_products.css' %}"> 
-<link rel="stylesheet" href="{% static 'css/responsive.css' %}"> 
-<!-- Connect to CSS file -->
+<link rel="stylesheet" href="{% static 'css/card_products.css' %}">
+<link rel="stylesheet" href="{% static 'css/responsive.css' %}">
 
 {% for product in products %}
 <div class="card">
     <div class="image">
         {% if product.img %}
-        <img src="{{ product.img.url }}" alt="{{ product.name }}" class="product-image">
+        <img src="{{ product.img.url }}"  class="product-image">
         {% else %}
         <span class="text">No image available</span>
         {% endif %}

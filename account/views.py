@@ -9,6 +9,9 @@ from .models import Product, Category , Branch
 from .forms import ProductForm
 from django.http import JsonResponse
 from .models import Product, Favorite
+from django.contrib.auth import password_validation
+from django.core.exceptions import ValidationError
+
 
 
 
@@ -79,12 +82,22 @@ def signup(request):
             messages.error(request, "El correo ya está en uso.")
             return redirect('signup')
 
+        # Validación de la contraseña
         try:
+            password_validation.validate_password(password)  # Aquí se valida la contraseña
+
+            # Si todo está bien, crea el usuario
             user = User.objects.create_user(username=username, email=email, password=password)
             user_group, _ = Group.objects.get_or_create(name='User')
             user.groups.add(user_group)
             messages.success(request, 'Registro exitoso.')
             return redirect('signin')
+
+        except ValidationError as e:
+            for error in e.messages:
+                messages.error(request, error)  # Muestra los errores de validación
+            return redirect('signup')
+
         except Exception as e:
             messages.error(request, "Ocurrió un error. Intenta nuevamente.")
             print(f"Error: {e}")

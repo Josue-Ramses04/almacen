@@ -43,5 +43,7 @@ admin.site.register(Branch)
 # Registra el modelo de usuario con la personalización
 admin.site.unregister(User)
 
+
 admin.site.register(User, UserAdmin)
+
 admin.site.register(Category)

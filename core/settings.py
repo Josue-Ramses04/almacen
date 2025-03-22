@@ -68,10 +68,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'whitenoise.runserver_nostatic',
     'account',
+    'axes',  # Correcto
+    'django_otp',
+    'django_otp.plugins.otp_totp',
      
 ]
 
 MIDDLEWARE = [
+    'axes.middleware.AxesMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -116,13 +120,25 @@ DATABASES = {
 
 
 
+AUTHENTICATION_BACKENDS = (
+    'axes.backends.AxesBackend',  # Backend de Axes
+    'django.contrib.auth.backends.ModelBackend',
+)
 
+AXES_FAILURE_LIMIT = 5  # Número máximo de intentos antes de bloqueo
+AXES_COOLOFF_TIME = 1  # Tiempo en horas antes de desbloqueo automático
+AXES_LOCKOUT_TEMPLATE = 'lockout.html'
+AXES_ONLY_USER_FAILURES = True  # Solo bloquear al usuario con intentos fallidos
 
-
-
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -130,6 +146,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {'min_length': 12},  # Exige al menos 12 caracteres
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -138,7 +155,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -169,3 +185,4 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CSRF_TRUSTED_ORIGINS = ['https://almacen-production-b1b7.up.railway.app']
+

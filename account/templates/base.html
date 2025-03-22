@@ -35,14 +35,14 @@
             {% with request.resolver_match.url_name as url_name %}
             <nav class="navegacion">
                 <ul>
-                    {% if user.is_superuser %}
+                    {% if user.is_superuser or user.is_staff %}
                     <li>
                         <a id="inbox" href="{% url 'admin:index' %}" class="{% if url_name == 'admin:index' %}active{% endif %}">
                             <ion-icon name="settings-outline"></ion-icon>
                             <span>Admin Panel</span>
                         </a>
                     </li>
-                    {% endif %}
+                {% endif %}
                     <li>
                         <a href="{% url 'index' %}" class="{% if url_name == 'index' %}active{% endif %}">
                             <ion-icon name="cube-outline"></ion-icon> <!-- Changed icon to represent products -->

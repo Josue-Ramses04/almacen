@@ -1,0 +1,20 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuenta Bloqueada</title>
+    <link rel="stylesheet" href="{% static 'css/lockout.css' %}">
+</head>
+<body>
+    {% block content %}
+    <div class="container">
+        <h1>Cuenta bloqueada</h1>
+        <p>Has excedido el número de intentos permitidos.</p>
+        <p>Por favor, espera unos minutos o contacta con el administrador.</p>
+        <a href="/signin">Volver al inicio de sesión</a>
+    </div>
+    {% endblock %}
+</body>
+</html>
