@@ -1,19 +1,16 @@
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import render, redirect,redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
-from django.contrib.auth.models import User
-from .models import Product, Category , Branch
+from django.core.exceptions import ValidationError
+from django.contrib.auth import password_validation
+from django.utils.timezone import now
+import datetime
+from .models import Product, Category, Branch, Favorite, RegistrationAttempt
 from .forms import ProductForm
 from django.http import JsonResponse
-from .models import Product, Favorite
-from django.contrib.auth import password_validation
-from django.core.exceptions import ValidationError
-
-
-
 
 
 
@@ -59,7 +56,19 @@ def signin(request):
 
     return render(request, "signin.html")
 
+
+
 # Vista de registro
+
+def get_client_ip(request):
+    """ Obtiene la dirección IP del usuario """
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
 def signup(request):
     if request.user.is_authenticated:
         return redirect('/')
@@ -70,6 +79,27 @@ def signup(request):
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
 
+        # Capturar información del usuario
+        user_ip = get_client_ip(request)
+        user_agent = request.META.get('HTTP_USER_AGENT', '')
+
+        # Definir el tiempo límite (ejemplo: 1 hora)
+        time_threshold = now() - datetime.timedelta(hours=1)
+
+        # Contar intentos recientes desde la misma IP
+        recent_attempts = RegistrationAttempt.objects.filter(ip_address=user_ip, timestamp__gte=time_threshold)
+
+        # Límite de intentos de registro por IP
+        if recent_attempts.count() >= 3:
+            messages.error(request, "Demasiados intentos de registro. Intenta más tarde.")
+            return redirect('signup')
+
+        # Verificar si el administrador ha bloqueado el registro
+        if RegistrationAttempt.objects.filter(ip_address=user_ip, is_allowed=False).exists():
+            messages.error(request, "El registro desde este dispositivo ha sido bloqueado por un administrador.")
+            return redirect('signup')
+
+        # Validaciones básicas
         if password != confirm_password:
             messages.error(request, "Las contraseñas no coinciden.")
             return redirect('signup')
@@ -84,12 +114,16 @@ def signup(request):
 
         # Validación de la contraseña
         try:
-            password_validation.validate_password(password)  # Aquí se valida la contraseña
+            password_validation.validate_password(password)  # Valida la seguridad de la contraseña
 
-            # Si todo está bien, crea el usuario
+            # Crear el usuario si todo está bien
             user = User.objects.create_user(username=username, email=email, password=password)
             user_group, _ = Group.objects.get_or_create(name='User')
             user.groups.add(user_group)
+
+            # Registrar el intento de registro exitoso
+            RegistrationAttempt.objects.create(user=user, ip_address=user_ip, user_agent=user_agent)
+
             messages.success(request, 'Registro exitoso.')
             return redirect('signin')
 
@@ -103,6 +137,9 @@ def signup(request):
             print(f"Error: {e}")
 
     return render(request, 'signup.html')
+
+
+
 
 
 # logout

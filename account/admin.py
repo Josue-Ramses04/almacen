@@ -3,6 +3,7 @@ from django.contrib.auth.models import User, Group
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
 from .models import Product, Category, Branch
+from .models import RegistrationAttempt
 
 # Filtro personalizado para separar usuarios por grupo
 class GroupFilter(admin.SimpleListFilter):
@@ -32,6 +33,27 @@ class UserAdmin(admin.ModelAdmin):
 
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'category', 'branch')
+
+
+
+
+
+class RegistrationAttemptAdmin(admin.ModelAdmin):
+    list_display = ('ip_address', 'user', 'timestamp', 'is_allowed')
+    list_filter = ('is_allowed', 'timestamp')
+    actions = ['permitir_registros', 'bloquear_registros']
+
+    def permitir_registros(self, request, queryset):
+        queryset.update(is_allowed=True)
+    permitir_registros.short_description = "Permitir registros seleccionados"
+
+    def bloquear_registros(self, request, queryset):
+        queryset.update(is_allowed=False)
+    bloquear_registros.short_description = "Bloquear registros seleccionados"
+
+
+
+admin.site.register(RegistrationAttempt, RegistrationAttemptAdmin)
 
 
 admin.site.register(Product, ProductAdmin)

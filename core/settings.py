@@ -15,6 +15,8 @@ import pymysql
 pymysql.install_as_MySQLdb()
 
 
+
+
 from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
@@ -83,8 +85,9 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware', 
-   
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',     
+
+  
 ]
 
 LOGIN_URL = '/signin/'
