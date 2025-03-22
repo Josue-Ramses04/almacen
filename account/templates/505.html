@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Error 505{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <h1>Error 505: HTTP Version Not Supported</h1>
+    <p>Sorry, the server does not support the HTTP protocol version that was used in the request.</p>
+    <a href="{% url 'index' %}" class="btn btn-primary">Go to Homepage</a>
+</div>
+{% endblock content %}

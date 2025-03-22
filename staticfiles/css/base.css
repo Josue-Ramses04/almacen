@@ -1,0 +1,46 @@
+/* Contenedor de los botones */
+.button-container {
+    display: flex;
+    background-color: black;
+    width: 300px;  /* Ajusta el ancho según el número de botones que quieras */
+    height: 70px;  /* Altura para que los botones no se vean demasiado grandes */
+    align-items: center;
+    justify-content: space-around;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* Añadí sombra para un efecto de profundidad */
+    padding: 0 10px;  /* Agregué padding para un poco de espacio alrededor de los botones */
+}
+
+/* Estilo para los botones */
+.button {
+    outline: 0 !important;
+    border: 0 !important;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: all 0.2s ease-in-out;  /* Tiempo de transición más suave */
+    cursor: pointer;
+    box-sizing: border-box;  /* Asegura que el padding y border no afecten el tamaño del botón */
+}
+
+/* Efecto de hover para los botones */
+.button:hover {
+    transform: translateY(-3px);
+    background-color: rgba(255, 255, 255, 0.2);  /* Añadí un fondo sutil al hacer hover */
+}
+
+/* Estilo para los iconos dentro de los botones */
+.icon {
+    font-size: 25px;
+    transition: transform 0.3s ease-in-out;  /* Añadí una transición para los iconos */
+}
+
+/* Opcional: Si quieres cambiar el tamaño del icono cuando el botón se pasa el mouse */
+.button:hover .icon {
+    transform: scale(1.1);  /* Icono ligeramente más grande en hover */
+}

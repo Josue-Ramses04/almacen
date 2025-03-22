@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Favorite Products{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/card_products.css' %}"> 
+<link rel="stylesheet" href="{% static 'css/responsive.css' %}"> 
+
+<div class="card-container">
+    {% for product in products %}
+    <div class="card">
+        <div class="image">
+            {% if product.img %}
+            <img src="{{ product.img.url }}" alt="{{ product.name }}" class="product-image">
+            {% else %}
+            <span class="text">No image available</span>
+            {% endif %}
+        </div>
+        <span class="title">{{ product.name }}</span>
+        <span class="price">${{ product.price }}</span>
+        <ion-icon name="star" class="favorite-icon" data-product-id="{{ product.id }}"></ion-icon>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    document.querySelectorAll('.favorite-icon').forEach(icon => {
+        icon.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            fetch(`/toggle-favorite/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'removed') {
+                    this.closest('.card').remove(); // Remove the card from the DOM
+                }
+            });
+        });
+    });
+</script>
+{% endblock content %}

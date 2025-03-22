@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/acceso_denegado.css' %}">
+    <title></title>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🚫</div> <!-- Icono de prohibido -->
+        <h1>Acceso Denegado</h1>
+        <p>No tienes permisos de administrador para entrar aquí.</p>
+        <a href="{% url 'index' %}" class="button">Volver al Inicio</a>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

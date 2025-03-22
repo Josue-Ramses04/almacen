@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Product Management Dashboard{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="{% static 'css/table.css' %}">
+
+<header>
+    <h1 class="display-4">Productos</h1>
+    <div class="search-container mb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search for products..."
+            onkeyup="searchProducts()">
+    </div>
+</header>
+
+<!-- Tabla de productos -->
+<table id="productTable" class="table table-striped table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">Product</th>
+            <th scope="col">Category</th>
+            <th scope="col">Stock</th>
+            <th scope="col">Price</th>
+            <th scope="col">Branch</th> <!-- Add Branch column -->
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+        <tr>
+            <td>{{ product.name }}</td>
+            <td>{{ product.category }}</td>
+            <td class="stock" {% if product.stock <= 0 %} data-stock="low"{% endif %}>
+                {% if product.stock <= 0 %}0{% else %}{{ product.stock }}{% endif %}
+            </td>
+            <td>${{ product.price }}</td>
+            <td>{{ product.branch.name }}</td> <!-- Display Branch name -->
+            <td class="actions-column">
+                <div class="action-buttons">
+                    <button class="Btn" data-toggle="modal" data-target="#editProductModal{{ product.id }}">Edit
+                        <svg class="svg" viewBox="0 0 512 512">
+                            <path d="M410.3 231l11.3-11.3-33.9-33.9-62.1-62.1L291.7 89.8l-11.3 11.3-22.6 22.6L58.6 322.9c-10.4 10.4-18 23.3-22.2 37.4L1 480.7c-2.5 8.4-.2 17.5 6.1 23.7s15.3 8.5 23.7 6.1l120.3-35.4c14.1-4.2 27-11.8 37.4-22.2L387.7 253.7 410.3 231zM160 399.4l-9.1 22.7c-4 3.1-8.5 5.4-13.3 6.9L59.4 452l23-78.1c1.4-4.9 3.8-9.4 6.9-13.3l22.7-9.1v32c0 8.8 7.2 16 16 16h32zM362.7 18.7L348.3 33.2 325.7 55.8 314.3 67.1l33.9 33.9 62.1 62.1 33.9 33.9 11.3-11.3 22.6-22.6 14.5-14.5c25-25 25-65.5 0-90.5L453.3 18.7c-25-25-65.5-25-90.5 0zm-47.4 168l-144 144c-6.2 6.2-16.4 6.2-22.6 0s-6.2-16.4 0-22.6l144-144c6.2-6.2 16.4-6.2 22.6 0s6.2 16.4 0 22.6z"></path>
+                        </svg>
+                    </button>
+                    <button class="bin-button" data-toggle="modal" data-target="#deleteProductModal{{ product.id }}">
+                        <svg class="bin-top" viewBox="0 0 39 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <line y1="5" x2="39" y2="5" stroke="white" stroke-width="4"></line>
+                            <line x1="12" y1="1.5" x2="26.0357" y2="1.5" stroke="white" stroke-width="3"></line>
+                        </svg>
+                        <svg class="bin-bottom" viewBox="0 0 33 39" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <mask id="path-1-inside-1_8_19" fill="white">
+                                <path d="M0 0H33V35C33 37.2091 31.2091 39 29 39H4C1.79086 39 0 37.2091 0 35V0Z"></path>
+                            </mask>
+                            <path d="M0 0H33H0ZM37 35C37 39.4183 33.4183 43 29 43H4C-0.418278 43 -4 39.4183 -4 35H4H29H37ZM4 43C-0.418278 43 -4 39.4183 -4 35V0H4V35V43ZM37 0V35C37 39.4183 33.4183 43 29 43V35V0H37Z" fill="white" mask="url(#path-1-inside-1_8_19)"></path>
+                            <path d="M12 6L12 29" stroke="white" stroke-width="4"></path>
+                            <path d="M21 6V29" stroke="white" stroke-width="4"></path>
+                        </svg>
+                    </button>
+                </div>
+            </td>
+        </tr>
+
+        <!-- Modal for Editing Product -->
+        <div class="modal fade" id="editProductModal{{ product.id }}" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editProductForm" method="POST" action="{% url 'edit_product' product.id %}" enctype="multipart/form-data"> <!-- Add enctype for file upload -->
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="editProductName">Product Name</label>
+                                <input type="text" class="form-control" id="editProductName" name="name" value="{{ product.name }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editProductPrice">Price</label>
+                                <input type="number" class="form-control" id="editProductPrice" name="price" value="{{ product.price }}" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editProductCategory">Category</label>
+                                <select class="form-control" id="editProductCategory" name="category" required>
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}" {% if category.id == product.category.id %}selected{% endif %}>{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="editProductStock">Stock</label>
+                                <input type="number" class="form-control" id="editProductStock" name="stock" value="{{ product.stock }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="editProductBranch">Branch</label>
+                                <select class="form-control" id="editProductBranch" name="branch" required>
+                                    {% for branch in branches %}
+                                    <option value="{{ branch.id }}" {% if branch.id == product.branch.id %}selected{% endif %}>{{ branch.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <!-- New field for image upload -->
+                            <div class="form-group">
+                                <label for="editProductImage">Product Image</label>
+                                <input type="file" class="form-control-file" id="editProductImage" name="img">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-warning">Save Changes</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Modal de creación de producto -->
+<div class="modal fade" id="createProductModal" tabindex="-1" role="dialog" aria-labelledby="createProductModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createProductModalLabel">Create Product</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'create_product' %}" enctype="multipart/form-data"> <!-- Add enctype for file upload -->
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="productName">Product Name</label>
+                        <input type="text" class="form-control" id="productName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productPrice">Price</label>
+                        <input type="number" class="form-control" id="productPrice" name="price" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productCategory">Category</label>
+                        <select class="form-control" id="productCategory" name="category" required>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="productStock">Stock</label>
+                        <input type="number" class="form-control" id="productStock" name="stock" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productBranch">Branch</label>
+                        <select class="form-control" id="productBranch" name="branch" required>
+                            {% for branch in branches %}
+                            <option value="{{ branch.id }}">{{ branch.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- New field for image upload -->
+                    <div class="form-group">
+                        <label for="productImage">Product Image</label>
+                        <input type="file" class="form-control-file" id="productImage" name="img">
+                    </div>
+                    <button type="submit" class="boton-primario">Create Product</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'modals.html' %}
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="{% static 'js/manage_product.js' %}"></script>
+
+{% endblock %}

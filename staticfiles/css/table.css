@@ -1,0 +1,341 @@
+adaptalo /* Variables para el modo claro */
+:root {
+  --main-color-light: #000;
+  --submain-color-light: #78858F;
+  --bg-color-light: #d4d4d4;
+  
+  --main-color-dark: #fff;
+  --submain-color-dark: #ccc;
+  --bg-color-dark: #000;
+}
+
+/* Modo claro */
+body.light-mode .card {
+  --main-color: var(--main-color-light);
+  --submain-color: var(--submain-color-light);
+  --bg-color: var(--bg-color-light);
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+}
+
+/* Estilos base de la tabla */
+.table {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  border-collapse: separate;
+  border-spacing: 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.table thead {
+  background-color: #362f2d;
+  border-bottom: 2px solid #1a1d1e;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+  border-bottom: 3px solid #e0e0e0;
+}
+
+.table tbody tr:hover {
+  background-color: #f1f2f3;
+  transition: background-color 0.2s ease;
+}
+
+.table th,
+.table td {
+  border-right: 1px solid #e0e0e0;
+}
+
+.table th:last-child,
+.table td:last-child {
+  border-right: none;
+}
+
+.stock[data-stock="low"] {
+  background-color: #f44336;
+  color: white;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  text-align: left;
+  animation: flash 1s infinite;
+  min-width: 50px;
+}
+
+@keyframes flash {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.actions-column {
+  width: 220px;
+  padding: 0.5rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-warning.btn-sm, 
+.btn-danger.btn-sm {
+  min-width: 90px;
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  border-radius: 4px;
+  text-align: center;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-warning.btn-sm {
+  background-color: #4287f5;
+  color: white;
+}
+
+.btn-danger.btn-sm {
+  background-color: #940000;
+  color: white;
+}
+
+.btn-warning.btn-sm:hover {
+  background-color: #2d6ed9;
+}
+
+.btn-danger.btn-sm:hover {
+  background-color: #c82333;
+}
+
+body.dark-mode .table {
+  background-color: #1e1e1e;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .table thead {
+  background-color: #333;
+  border-bottom: 2px solid #444;
+}
+
+body.dark-mode .table th,
+body.dark-mode .table td {
+  color: #ffffff;
+}
+
+body.dark-mode .table tbody tr:nth-child(even) {
+  background-color: #2a2a2a;
+}
+
+body.dark-mode .table tbody tr:hover {
+  background-color: #333;
+}
+
+body.dark-mode .stock[data-stock="low"] {
+  background-color: #b71c1c;
+}
+
+body.dark-mode .btn-warning.btn-sm {
+  background-color: #5c6bc0;
+  color: #fff;
+}
+
+body.dark-mode .btn-danger.btn-sm {
+  background-color: #e53935;
+  color: #fff;
+}
+
+body.dark-mode .form-control {
+  background-color: #333;
+  color: #e0e0e0;
+  border: 1px solid #555;
+}
+
+body.dark-mode .form-control:focus {
+  background-color: #444;
+  border-color: #666;
+  box-shadow: 0 0 5px #666;
+}
+
+
+/* Boton Delete */
+
+.bin-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 70px;
+  height: 40px;
+  border-radius: 15px;
+  background-color: rgb(255, 81, 81);
+  cursor: pointer;
+  border: none;
+  transition-duration: 0.3s;
+}
+.bin-bottom {
+  width: 10px;
+}
+.bin-top {
+  width: 12px;
+  transform-origin: right;
+  transition-duration: 0.3s;
+}
+.bin-button:hover .bin-top {
+  transform: rotate(45deg);
+}
+.bin-button:hover {
+  background-color: rgb(255, 0, 0);
+}
+.bin-button:active {
+  transform: scale(0.9);
+}
+
+
+/* Boton Edite */
+
+.Btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100px;
+  height: 40px;
+  border: none;
+  padding: 0px 20px;
+  background-color: #6c9cb4;  /* #2d6ed9; */
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+
+  transition-duration: .3s;
+}
+
+.svg {
+  width: 13px;
+  position: absolute;
+  right: 0;
+  margin-right: 20px;
+  fill: white;
+  transition-duration: .3s;
+}
+
+.Btn:hover {
+  color: transparent;
+}
+
+.Btn:hover svg {
+  right: 43%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  transition-duration: .3s;
+}
+
+.Btn:active {
+  transform: translate(3px , 3px);
+  transition-duration: .3s;
+ 
+}
+.boton-primario {
+  background-color: var(--color-boton);
+  color: var(--color-boton-texto);
+  outline: none;
+  border: none;
+  width: 100%;
+  padding: 20px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+ 
+/* Center the modal dialog */
+.modal-dialog {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Ensure it takes the full height of the viewport */
+
+}
+
+/* Responsive adjustments for tablets and smaller devices */
+@media (max-width: 768px) {
+  .table {
+    width: 100%;
+    overflow-x: auto; /* Allow
+  }
+
+  .actions-column {
+    width: auto; /* Allow the actions column to adjust its width */
+    padding: 0.5rem;
+  }
+
+  .action-buttons {
+    flex-direction: column; /* Stack buttons vertically on smaller screens */
+    gap: 4px;
+  }
+
+  .Btn, .bin-button {
+    width: 100%; /* Full width buttons on smaller screens */
+    justify-content: center; /* Center content within buttons */
+  }
+
+  .modal-dialog {
+    width: 90%; /* Reduce modal width on smaller screens */
+    max-width: 500px; /* Set a maximum width for the modal */
+  }
+}
+
+/* Responsive adjustments for mobile phones */
+@media (max-width: 480px) {
+  header h1 {
+    font-size: 1.5rem; /* Smaller font size for headers */
+  }
+
+  .search-container input {
+    padding: 0.3rem; /* Reduce padding for input fields */
+  }
+
+  .Btn, .bin-button {
+    height: 35px; /* Reduce button height */
+    font-size: 0.875rem; /* Smaller font size for buttons */
+  }
+
+  .table th, .table td {
+    font-size: 0.75rem; /* Smaller font size for table content */
+    padding: 0.5rem; /* Reduce padding for table cells */
+  }
+
+  .modal-dialog {
+    width: 95%; /* Further reduce modal width on mobile phones */
+    max-width: 400px; /* Set a smaller maximum width for the modal */
+  }
+}

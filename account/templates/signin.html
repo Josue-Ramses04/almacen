@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <title>Login & Signup Flip Card</title>
+</head>
+
+<body>
+  <div class="login-box">
+    <p>Login</p>
+
+    <form method="POST">
+      {% csrf_token %}
+      
+      <div class="user-box">
+        <input required="" name="email" type="email" value="{{ request.POST.email }}">
+        <label>Email</label>
+      </div>
+      <div class="user-box">
+        <input required="" name="password" id="password" type="password">
+        <label>Password</label>
+        <!-- Ícono para mostrar/ocultar contraseña -->
+        <i class="fa fa-eye" id="togglePassword" class="toggle-password"></i>
+      </div>
+      <!-- Mostrar mensajes de error -->
+      {% if messages %}
+      {% for message in messages %}
+        <p class="message {% if message.level_tag == 'success' %}success{% else %}error{% endif %}">
+          {{ message }}
+        </p>
+      {% endfor %}
+    {% endif %}
+     
+      <!-- Aseguramos que el botón de submit esté bien definido -->
+      <button type="submit" class="submit-btn">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        Submit
+      </button>
+    </form>
+
+    <p>Don't have an account? <a href="{% url 'signup' %}" class="a2">Sign up!</a></p>
+  </div>
+
+  <script src="{% static 'js/signin.js' %}"></script>
+</body>
+
+</html>

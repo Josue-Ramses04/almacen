@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Product Details{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/card_products.css' %}"> 
+<link rel="stylesheet" href="{% static 'css/responsive.css' %}"> 
+<!-- Connect to CSS file -->
+
+{% for product in products %}
+<div class="card">
+    <div class="image">
+        {% if product.img %}
+        <img src="{{ product.img.url }}" alt="{{ product.name }}" class="product-image">
+        {% else %}
+        <span class="text">No image available</span>
+        {% endif %}
+    </div>
+    <span class="title">{{ product.name }}</span>
+    <span class="price">${{ product.price }}</span>
+    <ion-icon name="{% if product in user.favorite_set.all %}star{% else %}star-outline{% endif %}" class="favorite-icon" data-product-id="{{ product.id }}"></ion-icon>
+</div>
+{% endfor %}
+
+<script>
+    document.querySelectorAll('.favorite-icon').forEach(icon => {
+        icon.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            fetch(`/toggle-favorite/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'added') {
+                    this.setAttribute('name', 'star');
+                } else {
+                    this.setAttribute('name', 'star-outline');
+                }
+            });
+        });
+    });
+</script>
+{% endblock content %}

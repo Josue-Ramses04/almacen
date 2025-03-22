@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <title>Login & Signup Flip Card</title>
+</head>
+
+<body>
+    <div class="login-box">
+        <p>Sign Up</p>
+
+    
+
+        <!-- Formulario de registro -->
+        <form method="POST">
+            {% csrf_token %}
+            <div class="user-box">
+                <input required="" name="username" type="text" value="{{ request.POST.username }}">
+                <label>Username</label>
+            </div>
+
+            <div class="user-box">
+                <input required="" name="email" type="email" value="{{ request.POST.email }}">
+                <label>Email</label>
+            </div>
+
+            <div class="user-box">
+                <input required="" name="password" type="password">
+                <label>Password</label>
+            </div>
+
+            <div class="user-box">
+                <input required="" name="confirm_password" type="password">
+                <label>Confirm Password</label>
+            </div>
+                <!-- Mostrar mensajes de error o éxito -->
+        {% if messages %}
+        {% for message in messages %}
+          <p class="message {% if message.level_tag == 'success' %}success{% else %}error{% endif %}">
+            {{ message }}
+          </p>
+        {% endfor %}
+      {% endif %}
+       
+
+            <button type="submit" class="submit-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                Submit
+            </button>
+
+        </form>
+        <p>Do you have an account? <a href="{% url 'signin' %}" class="a2">Signin!</a></p>
+    </div>
+    
+  
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+
+</html>

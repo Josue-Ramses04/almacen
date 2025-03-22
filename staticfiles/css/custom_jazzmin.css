@@ -1,0 +1,7 @@
+/* Center icons in the sidebar when collapsed */
+.sidebar-mini.sidebar-collapse .nav-sidebar .nav-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}

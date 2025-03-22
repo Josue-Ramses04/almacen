@@ -1,0 +1,9 @@
+asgiref==3.8.1
+Django==5.1.6
+django-admin-soft-dashboard==1.0.24
+django-jazzmin==3.0.1
+gunicorn==23.0.0
+mysqlclient==2.2.7
+packaging==24.2
+pillow==11.1.0
+sqlparse==0.5.3

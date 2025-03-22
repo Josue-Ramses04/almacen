@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bienvenido{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/loader.css' %}">
+<link rel="stylesheet" href="{% static 'css/index.css' %}">
+<link rel="stylesheet" href="{% static 'css/crud.css' %}">
+
+
+{% endblock %}
+
+{% block content %}
+
+<!-- Contenedor del Loader -->
+<img src="static/img/0001.jpg" alt="Descripción de la imagen">
+<!-- Mensaje después del loader -->
+ 
+{% endblock %}
+
+
+
+
+
+
+
+{% block extra_js %}
+<script src="{% static 'js/loader.js' %}"></script>
+{% endblock %}
+
+
+
+
+<div class="loader-container">
+  <div class="wrapper">
+      <div class="circle"></div>
+      <div class="circle"></div>
+      <div class="circle"></div>
+      <div class="shadow"></div>
+      <div class="shadow"></div>
+      <div class="shadow"></div>
+  </div>
+</div>

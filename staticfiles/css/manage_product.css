@@ -1,0 +1,374 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.search-container input {
+    width: 75%;
+    padding: 0.5rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.search-container input:hover {
+    background-color: #e6e6e6;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.table {
+    width: 100%;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    margin: 2rem auto;
+    border-collapse: separate;
+    border-spacing: 0;
+    max-width: 1200px;
+}
+
+.table thead {
+    background-color: #2d3436;
+}
+
+.table th {
+    color: white;
+    font-weight: 500;
+    padding: 1rem 1.5rem;
+    text-transform: uppercase;
+    font-size: 0.9em;
+    letter-spacing: 0.5px;
+    border-bottom: none;
+}
+
+.table td {
+    padding: 1rem 1.5rem;
+    vertical-align: middle;
+    border: none;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid #f1f2f3;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.table tbody tr:hover {
+    background-color: #f1f2f3;
+    transition: background-color 0.2s ease;
+}
+
+/* Stock styling */
+.stock {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9em;
+    display: inline-block;
+    min-width: 60px;
+    text-align: center;
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.stock[data-stock="low"] {
+    background-color: #ffebee;
+    color: #c62828;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* Contenedor de acciones */
+.table td:last-child {
+    width: 120px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    padding: 0.5rem 1.5rem;
+}
+
+/* Botones de acción */
+.edit-button, .button {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background-color: #2d3436;
+    margin: 0;
+    transition: all 0.2s ease;
+}
+
+.edit-button:hover {
+    background-color: #ffa502;
+    transform: translateY(-2px);
+}
+
+.button:hover {
+    background-color: #ff4757;
+    transform: translateY(-2px);
+}
+
+.svgIcon, .edit-svgIcon {
+    width: 15px;
+    height: 15px;
+}
+
+/* Ajustes para el efecto hover de los botones */
+.edit-button:hover::before,
+.button:hover::before {
+    transform: translateY(25px);
+}
+
+/* Contenedor para los botones de acción */
+.table td:last-child {
+    width: 200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+}
+
+/* Ajustes para los botones */
+.edit-button {
+    margin-right: auto; /* Empuja el botón hacia la izquierda */
+}
+
+.button {
+    margin-left: auto; /* Empuja el botón hacia la derecha */
+}
+
+/* Aseguramos que los efectos hover no interfieran entre sí */
+.edit-button:hover,
+.button:hover {
+    z-index: 2;
+}
+
+/* Stock styling */
+.stock {
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    display: inline-block;
+    min-width: 80px;
+    text-align: center;
+}
+
+.stock:not([data-stock="low"]) {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.stock[data-stock="low"] {
+    background-color: #dc493c;
+    color: white;
+    padding: 0.5rem;
+    border-radius: 3px;
+    text-align: center;
+    animation: flash 1s infinite;
+}
+
+@keyframes flash {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.modal-dialog {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.818) !important;
+}
+
+/* Botones */
+.boton-primario {
+    background-color: var(--color-boton);
+    color: var(--color-boton-texto);
+    outline: none;
+    border: none;
+    width: 100%;
+    padding: 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.boton-primario:hover {
+    background-color: #6c9cb4;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #6c9cb4;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.btn-secondary:hover {
+    background-color: #a4bccc;
+}
+
+.form-control {
+    background-color: #f4f4f4;
+    color: var(--color-texto);
+    border: 1px solid var(--color-borde);
+}
+
+.form-control:focus {
+    background-color: var(--color-input-focus);
+    color: var(--color-texto);
+    border-color: var(--color-boton);
+    outline: none;
+    box-shadow: 0 0 5px var(--color-boton);
+}
+
+
+
+
+
+
+.button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgb(20, 20, 20);
+    border: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.164);
+    cursor: pointer;
+    transition-duration: .3s;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .svgIcon {
+    width: 12px;
+    transition-duration: .3s;
+  }
+  
+  .svgIcon path {
+    fill: white;
+  }
+  
+  .button:hover {
+    width: 140px;
+    border-radius: 50px;
+    transition-duration: .3s;
+    background-color: rgb(255, 69, 69);
+    align-items: center;
+  }
+  
+  .button:hover .svgIcon {
+    width: 50px;
+    transition-duration: .3s;
+    transform: translateY(60%);
+  }
+  
+  .button::before {
+    position: absolute;
+    top: -20px;
+    content: "Delete";
+    color: white;
+    transition-duration: .3s;
+    font-size: 2px;
+  }
+  
+  .button:hover::before {
+    font-size: 13px;
+    opacity: 1;
+    transform: translateY(30px);
+    transition-duration: .3s;
+  }
+
+
+
+
+
+
+
+
+
+
+  .edit-button {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgb(20, 20, 20);
+    border: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.164);
+    cursor: pointer;
+    transition-duration: 0.3s;
+    overflow: hidden;
+    position: relative;
+    text-decoration: none !important;
+  }
+  
+  .edit-svgIcon {
+    width: 17px;
+    transition-duration: 0.3s;
+  }
+  
+  .edit-svgIcon path {
+    fill: white;
+  }
+  
+  .edit-button:hover {
+    width: 120px;
+    border-radius: 50px;
+    transition-duration: 0.3s;
+    background-color: rgb(255, 69, 69);
+    align-items: center;
+  }
+  
+  .edit-button:hover .edit-svgIcon {
+    width: 20px;
+    transition-duration: 0.3s;
+    transform: translateY(60%);
+    -webkit-transform: rotate(360deg);
+    -moz-transform: rotate(360deg);
+    -o-transform: rotate(360deg);
+    -ms-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+  
+  .edit-button::before {
+    display: none;
+    content: "Edit";
+    color: white;
+    transition-duration: 0.3s;
+    font-size: 2px;
+  }
+  
+  .edit-button:hover::before {
+    display: block;
+    padding-right: 10px;
+    font-size: 13px;
+    opacity: 1;
+    transform: translateY(0px);
+    transition-duration: 0.3s;
+  }
+  
+
+  

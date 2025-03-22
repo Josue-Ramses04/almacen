@@ -1,0 +1,83 @@
+
+
+
+<!-- Modal para Editar Producto -->
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% for product in products %}
+                <form id="editProductForm{{ product.id }}" method="POST" action="{% url 'edit_product' product.id %}" enctype="multipart/form-data"> <!-- Add enctype for file upload -->
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="editProductName{{ product.id }}">Product Name</label>
+                        <input type="text" class="form-control" id="editProductName{{ product.id }}" name="name" value="{{ product.name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editProductPrice{{ product.id }}">Price</label>
+                        <input type="number" class="form-control" id="editProductPrice{{ product.id }}" name="price" value="{{ product.price }}" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editProductCategory{{ product.id }}">Category</label>
+                        <select class="form-control" id="editProductCategory{{ product.id }}" name="category" required>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}" {% if category.id == product.category.id %}selected{% endif %}>{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editProductStock{{ product.id }}">Stock</label>
+                        <input type="number" class="form-control" id="editProductStock{{ product.id }}" name="stock" value="{{ product.stock }}" required>
+                    </div>
+                    <!-- New field for image upload -->
+                    <div class="form-group">
+                        <label for="editProductImage{{ product.id }}">Product Image</label>
+                        <input type="file" class="form-control-file" id="editProductImage{{ product.id }}" name="img">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-warning">Save Changes</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+<!-- Modal para Eliminar Producto -->
+ 
+{% for product in products %}
+<div class="modal fade" id="deleteProductModal{{ product.id }}" tabindex="-1" aria-labelledby="deleteProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteProductModalLabel">Delete Product</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this product?</p>
+                <form method="POST" action="{% url 'delete_product' product.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
