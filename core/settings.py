@@ -32,7 +32,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-c8jenlwr+q^zjc#c^5f@z5aklwoh-%pt)i1mwkwwnzx0#m62o='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS=['localhost', 'almacen-production-b1b7.up.railway.app']
 
