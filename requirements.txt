@@ -9,6 +9,8 @@ django-axes==7.0.2
 django-cloudinary-storage==0.3.0
 django-jazzmin==3.0.1
 django-otp==1.5.4
+django-ratelimit==4.1.0
+django-redis==5.4.0
 gunicorn==23.0.0
 idna==3.10
 mysql-connector-python==9.2.0
@@ -16,6 +18,7 @@ packaging==24.2
 pillow==11.1.0
 PyMySQL==1.1.1
 python-dotenv==1.0.1
+redis==5.2.1
 requests==2.32.3
 six==1.17.0
 sqlparse==0.5.3
