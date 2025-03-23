@@ -12,7 +12,7 @@ from .models import Product, Category, Branch, Favorite, RegistrationAttempt
 from .forms import ProductForm
 from django.http import JsonResponse
 from django_ratelimit.decorators import ratelimit
-from django.core.cache import cache
+
 
 
 
@@ -27,34 +27,39 @@ def custom_admin_redirect(request):
     return redirect('/admin/') #django-admin
 
 
-@ratelimit(key='ip', rate='5/m') 
+# Login view
+
 def signin(request):
     if request.user.is_authenticated:
         if request.user.is_staff:  
-            return redirect('/admin/')
-        return redirect('/')
+            return redirect('/admin/')  # Django-admin
+        else:
+            return redirect('/')  
 
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
-
-        # 🔹 Cachear la consulta del usuario por email
-        cache_key = f"user_email_{email}"
-        user = cache.get(cache_key)
-
-        if not user:
+        
+        try:
             user = User.objects.filter(email=email).first()
-            cache.set(cache_key, user, timeout=300)  # Guarda en caché por 5 minutos
-
-        if user:
-            user = authenticate(request, username=user.username, password=password)
             if user:
-                login(request, user)
-                return redirect('/admin/' if user.is_staff else "/")
+                user = authenticate(request, username=user.username, password=password)
+                if user:
+                    login(request, user)
+                    if user.is_staff:  
+                        return redirect('/admin/')
+                    else:  
+                        return redirect("/")  
+                else:
+                    messages.error(request, "Incorrect username or password.")
+            else:
+                messages.error(request, "Incorrect username or password.")
+        except Exception as e:
+            messages.error(request, "An error occurred. Please try again.")
+            print(f"Authentication error: {e}")
 
-        messages.error(request, "Incorrect username or password.")
-    
     return render(request, "signin.html")
+
 
 
 # Vista de registro
@@ -69,6 +74,7 @@ def get_client_ip(request):
     return ip
 
 
+
 def signup(request):
     if request.user.is_authenticated:
         return redirect('/')
@@ -79,19 +85,27 @@ def signup(request):
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
 
-        # Capturar información del usuario
+        # Capture user information
         user_ip = get_client_ip(request)
         user_agent = request.META.get('HTTP_USER_AGENT', '')
 
-        # 🔹 Cachear intentos de registro por IP para evitar consultas repetitivas
-        cache_key = f"registration_attempts_{user_ip}"
-        attempts = cache.get(cache_key, 0)
+        # Define the time threshold (example: 1 hour)
+        time_threshold = now() - datetime.timedelta(hours=1)
 
-        if attempts >= 3:
+        # Count recent attempts from the same IP
+        recent_attempts = RegistrationAttempt.objects.filter(ip_address=user_ip, timestamp__gte=time_threshold)
+
+        # Limit the number of registration attempts per IP
+        if recent_attempts.count() >= 3:
             messages.error(request, "Too many registration attempts. Please try again later.")
             return redirect('signup')
 
-        # Validaciones
+        # Check if the administrator has blocked registration
+        if RegistrationAttempt.objects.filter(ip_address=user_ip, is_allowed=False).exists():
+            messages.error(request, "Registration from this device has been blocked by an administrator.")
+            return redirect('signup')
+
+        # Basic validations
         if password != confirm_password:
             messages.error(request, "Passwords do not match.")
             return redirect('signup')
@@ -104,28 +118,32 @@ def signup(request):
             messages.error(request, "Email is already in use.")
             return redirect('signup')
 
-        # Validación de contraseña
+        # Password validation
         try:
-            password_validation.validate_password(password)
+            password_validation.validate_password(password)  # Validate password security
 
-            # Crear usuario
+            # Create the user if everything is fine
             user = User.objects.create_user(username=username, email=email, password=password)
             user_group, _ = Group.objects.get_or_create(name='User')
             user.groups.add(user_group)
 
-            # Registrar intento exitoso y resetear intentos en Redis
-            cache.delete(cache_key)
+            # Register the successful registration attempt
+            RegistrationAttempt.objects.create(user=user, ip_address=user_ip, user_agent=user_agent)
 
             messages.success(request, 'Registration successful.')
             return redirect('signin')
 
         except ValidationError as e:
-            messages.error(request, str(e))
-        
-        # 🔹 Incrementar intentos en Redis
-        cache.set(cache_key, attempts + 1, timeout=3600)  # Expira en 1 hora
+            for error in e.messages:
+                messages.error(request, error)  # Show validation errors
+            return redirect('signup')
+
+        except Exception as e:
+            messages.error(request, "An error occurred. Please try again.")
+            print(f"Error: {e}")
 
     return render(request, 'signup.html')
+
 
 
 
@@ -198,16 +216,12 @@ def manage_product(request):
 
 
 
+
 @login_required
 def product_list(request):
-    cache_key = "product_list_cache"
-    products = cache.get(cache_key)
+    products = Product.objects.all()
+    return render(request, 'product.html' , {'products': products})
 
-    if not products:
-        products = list(Product.objects.all())  # Convierte a lista para evitar problemas con QuerySet
-        cache.set(cache_key, products, timeout=600)  # Cachear por 10 minutos
-
-    return render(request, 'product.html', {'products': products})
 
 
 
@@ -222,37 +236,25 @@ def create_product(request):
         branch_id = request.POST.get('branch')  
         img = request.FILES.get('img')
         
+      
         category = Category.objects.get(id=category_id)
         branch = Branch.objects.get(id=branch_id)  
-
-        Product.objects.create(
+        
+        # Crea Nuevos Productos
+        new_product = Product.objects.create(
             name=name,
             category=category,
             stock=stock,
             price=price,
             user=request.user,
-            branch=branch,
-            img=img
+            branch=branch,  #Sucursal asociada al producto
+            img =img
         )
-
-        cache.delete("categories_cache")  # Limpiar caché cuando se crea un nuevo producto
-        cache.delete("branches_cache")  
-
-        return redirect('manage_product')
-
-    else:
-        # Cachear categorías y sucursales
-        categories = cache.get("categories_cache")
-        branches = cache.get("branches_cache")
-
-        if not categories:
-            categories = list(Category.objects.all())
-            cache.set("categories_cache", categories, timeout=3600)  # Cachear por 1 hora
         
-        if not branches:
-            branches = list(Branch.objects.all())
-            cache.set("branches_cache", branches, timeout=3600)  
-
+        return redirect('manage_product')
+    else:
+        categories = Category.objects.all()
+        branches = Branch.objects.all()  # Retrieve all branches
         return render(request, 'product.html', {'categories': categories, 'branches': branches})
 
 
