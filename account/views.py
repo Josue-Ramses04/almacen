@@ -12,6 +12,68 @@ from .models import Product, Category, Branch, Favorite, RegistrationAttempt
 from .forms import ProductForm
 from django.http import JsonResponse
 from django_ratelimit.decorators import ratelimit
+# Login view
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from django.contrib.auth.models import User
+from django.shortcuts import render, redirect
+from django_ratelimit.decorators import ratelimit
+from django.core.validators import validate_email
+from .models import EmailVerification
+from .utils import send_verification_email
+
+
+def request_email_verification(request):
+    """
+    Captura el email y envía un código de verificación.
+    """
+    if request.method == "POST":
+        email = request.POST.get("email").strip().lower()
+
+        # Generar código y guardarlo en la BD
+        code = EmailVerification.generate_code()
+        EmailVerification.objects.update_or_create(email=email, defaults={"code": code})
+        send_verification_email(email, code)
+
+        request.session["pending_email"] = email  # Guardar email en sesión
+        return redirect("verify_email_code")
+
+    return render(request, "request_email_verification.html")
+
+
+
+
+def verify_email_code(request):
+    """
+    Verifica el código de verificación y permite continuar con el registro.
+    """
+    pending_email = request.session.get("pending_email")
+    if not pending_email:
+        return redirect("request_email_verification")
+
+    if request.method == "POST":
+        code = request.POST.get("code")
+
+        verification = EmailVerification.objects.filter(email=pending_email, code=code).first()
+
+        if verification:
+            request.session["verified_email"] = pending_email  # Guardar email verificado en sesión
+            verification.delete()  # Eliminar el registro temporal
+            return redirect("signup_form")
+
+        messages.error(request, "Código incorrecto.")
+
+    return render(request, "verify_email_code.html")
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -27,36 +89,41 @@ def custom_admin_redirect(request):
     return redirect('/admin/') #django-admin
 
 
-# Login view
+
+
 
 def signin(request):
     if request.user.is_authenticated:
-        if request.user.is_staff:  
-            return redirect('/admin/')  # Django-admin
-        else:
-            return redirect('/')  
+        if request.user.is_staff:
+            return redirect('/admin/')  # Redirige a Django Admin si es administrador
+        return redirect('/')  # Redirige a home si es usuario normal
 
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
-        
+
         try:
             user = User.objects.filter(email=email).first()
+
             if user:
+                # 🔹 Bloqueo manual: Verificar si el usuario está activo
+                if not user.is_active:
+                    messages.error(request, "Tu cuenta ha sido bloqueada por un administrador.")
+                    return redirect('signin')
+
                 user = authenticate(request, username=user.username, password=password)
+
                 if user:
                     login(request, user)
-                    if user.is_staff:  
-                        return redirect('/admin/')
-                    else:  
-                        return redirect("/")  
+                    return redirect('/admin/' if user.is_staff else "/")
                 else:
-                    messages.error(request, "Incorrect username or password.")
+                    messages.error(request, "Nombre de usuario o contraseña incorrectos.")
             else:
-                messages.error(request, "Incorrect username or password.")
+                messages.error(request, "Nombre de usuario o contraseña incorrectos.")
+
         except Exception as e:
-            messages.error(request, "An error occurred. Please try again.")
-            print(f"Authentication error: {e}")
+            messages.error(request, "Ocurrió un error. Intenta nuevamente.")
+            print(f"Error de autenticación: {e}")
 
     return render(request, "signin.html")
 
@@ -75,75 +142,106 @@ def get_client_ip(request):
 
 
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User, Group
+from django.contrib import messages
+from django.contrib.auth import password_validation
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+from .models import EmailVerification
+from .utils import send_verification_email
+
 def signup(request):
     if request.user.is_authenticated:
         return redirect('/')
 
+    # Recuperar datos previos si existen
+    saved_data = request.session.get("signup_data", {})
+
     if request.method == 'POST':
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
+        username = request.POST.get('username', saved_data.get('username', '')).strip()
+        email = request.POST.get('email', saved_data.get('email', '')).strip()
+        password = request.POST.get('password', saved_data.get('password', ''))
+        confirm_password = request.POST.get('confirm_password', saved_data.get('confirm_password', ''))
+        verification_code = request.POST.get('verification_code', '').strip()
 
-        # Capture user information
-        user_ip = get_client_ip(request)
-        user_agent = request.META.get('HTTP_USER_AGENT', '')
+        # Si el usuario ingresó el código de verificación
+        if verification_code:
+            try:
+                email_verification = EmailVerification.objects.get(email=email, code=verification_code)
 
-        # Define the time threshold (example: 1 hour)
-        time_threshold = now() - datetime.timedelta(hours=1)
+                # Validar la seguridad de la contraseña antes de crear el usuario
+                password_validation.validate_password(email_verification.password)
 
-        # Count recent attempts from the same IP
-        recent_attempts = RegistrationAttempt.objects.filter(ip_address=user_ip, timestamp__gte=time_threshold)
+                # Crear el usuario con los datos almacenados
+                user = User.objects.create_user(
+                    username=email_verification.username,
+                    email=email_verification.email,
+                    password=email_verification.password
+                )
 
-        # Limit the number of registration attempts per IP
-        if recent_attempts.count() >= 3:
-            messages.error(request, "Too many registration attempts. Please try again later.")
+                # Agregar al grupo 'User'
+                user_group, _ = Group.objects.get_or_create(name='User')
+                user.groups.add(user_group)
+
+                email_verification.delete()  # Eliminar el registro temporal
+                request.session.pop("signup_data", None)  # Eliminar sesión
+
+                messages.success(request, 'Registro exitoso. Ya puedes iniciar sesión.')
+                return redirect('signin')
+
+            except EmailVerification.DoesNotExist:
+                messages.error(request, "Código incorrecto.")
+                return redirect('signup')
+
+        # Si no hay código, significa que es la primera vez que se ingresa el email
+        if not email:
+            messages.error(request, "El email es obligatorio.")
             return redirect('signup')
 
-        # Check if the administrator has blocked registration
-        if RegistrationAttempt.objects.filter(ip_address=user_ip, is_allowed=False).exists():
-            messages.error(request, "Registration from this device has been blocked by an administrator.")
+        if not username:
+            messages.error(request, "El nombre de usuario es obligatorio.")
             return redirect('signup')
 
-        # Basic validations
         if password != confirm_password:
-            messages.error(request, "Passwords do not match.")
+            messages.error(request, "Las contraseñas no coinciden.")
+            return redirect('signup')
+
+        try:
+            validate_email(email)
+        except ValidationError:
+            messages.error(request, "Email inválido.")
             return redirect('signup')
 
         if User.objects.filter(username=username).exists():
-            messages.error(request, "Username already exists.")
+            messages.error(request, "El nombre de usuario ya está en uso.")
             return redirect('signup')
 
         if User.objects.filter(email=email).exists():
-            messages.error(request, "Email is already in use.")
+            messages.error(request, "El email ya está registrado.")
             return redirect('signup')
 
-        # Password validation
-        try:
-            password_validation.validate_password(password)  # Validate password security
+        # Guardar datos en sesión para que no se pierdan
+        request.session["signup_data"] = {
+            "username": username,
+            "email": email,
+            "password": password,
+            "confirm_password": confirm_password
+        }
 
-            # Create the user if everything is fine
-            user = User.objects.create_user(username=username, email=email, password=password)
-            user_group, _ = Group.objects.get_or_create(name='User')
-            user.groups.add(user_group)
+        # Generar código de verificación y guardarlo en la BD
+        verification_code = EmailVerification.generate_code()
+        EmailVerification.objects.update_or_create(
+            email=email,
+            defaults={"code": verification_code, "username": username, "password": password}
+        )
 
-            # Register the successful registration attempt
-            RegistrationAttempt.objects.create(user=user, ip_address=user_ip, user_agent=user_agent)
+        send_verification_email(email, verification_code)
 
-            messages.success(request, 'Registration successful.')
-            return redirect('signin')
+        messages.success(request, "Te enviamos un código de verificación a tu correo.")
+        return redirect('signup')
 
-        except ValidationError as e:
-            for error in e.messages:
-                messages.error(request, error)  # Show validation errors
-            return redirect('signup')
-
-        except Exception as e:
-            messages.error(request, "An error occurred. Please try again.")
-            print(f"Error: {e}")
-
-    return render(request, 'signup.html')
-
+    return render(request, 'signup.html', {"signup_data": saved_data})
 
 
 

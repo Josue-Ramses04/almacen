@@ -2,6 +2,9 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.timezone import now
+import random
+
+
 
 class RegistrationAttempt(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
@@ -9,6 +12,7 @@ class RegistrationAttempt(models.Model):
     user_agent = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     is_allowed = models.BooleanField(default=True)  # Control manual del admin
+    
 
     def __str__(self):
         return f"{self.ip_address} - {self.timestamp}"
@@ -46,3 +50,25 @@ class Favorite(models.Model):
 
     class Meta:
         unique_together = ('user', 'product')
+        
+        
+
+
+
+
+
+
+class EmailVerification(models.Model):
+    email = models.EmailField(unique=True)
+    code = models.CharField(max_length=6)
+    username = models.CharField(max_length=150, blank=True, null=True)
+    password = models.CharField(max_length=128, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email
+
+    @staticmethod
+    def generate_code():
+        """Genera un código de verificación de 6 dígitos"""
+        return str(random.randint(100000, 999999))

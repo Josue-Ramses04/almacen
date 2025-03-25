@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Verificación de Email</title>
+</head>
+<body>
+    <h2>Introduce tu Email</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="email" name="email" required placeholder="Tu correo">
+        <button type="submit">Enviar Código</button>
+    </form>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+</body>
+</html>

@@ -85,7 +85,9 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',     
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',  
+    "django_otp.middleware.OTPMiddleware",
+   
 
   
 ]
@@ -176,7 +178,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es'
 
 TIME_ZONE = 'America/Mexico_City'
 
@@ -205,3 +207,12 @@ CSRF_TRUSTED_ORIGINS = ['https://almacen-production-b1b7.up.railway.app']
 
 
 
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True  # Si usas 587, debe ser True
+EMAIL_HOST_USER = 'ramses.devn@gmail.com'  
+EMAIL_HOST_PASSWORD = 'kticteadtrpjrirn'  # Clave de aplicación sin espacios
+DEFAULT_FROM_EMAIL = 'ramses.devn@gmail.com'
+PASSWORD_RESET_TIMEOUT=14400

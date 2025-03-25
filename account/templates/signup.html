@@ -13,54 +13,47 @@
     <div class="login-box">
         <p>Sign Up</p>
 
-    
-
         <!-- Formulario de registro -->
         <form method="POST">
             {% csrf_token %}
             <div class="user-box">
-                <input required="" name="username" type="text" value="{{ request.POST.username }}">
+                <input required="" name="username" type="text" value="{{ signup_data.username|default:'' }}">
                 <label>Username</label>
             </div>
 
             <div class="user-box">
-                <input required="" name="email" type="email" value="{{ request.POST.email }}">
+                <input required="" name="email" type="email" value="{{ signup_data.email|default:'' }}">
                 <label>Email</label>
             </div>
 
             <div class="user-box">
-                <input required="" name="password" type="password">
+                <input required="" name="password" type="password" value="{{ signup_data.password|default:'' }}">
                 <label>Password</label>
             </div>
 
             <div class="user-box">
-                <input required="" name="confirm_password" type="password">
+                <input required="" name="confirm_password" type="password" value="{{ signup_data.confirm_password|default:'' }}">
                 <label>Confirm Password</label>
             </div>
-                <!-- Mostrar mensajes de error o éxito -->
-        {% if messages %}
-        {% for message in messages %}
-          <p class="message {% if message.level_tag == 'success' %}success{% else %}error{% endif %}">
-            {{ message }}
-          </p>
-        {% endfor %}
-      {% endif %}
-       
 
-            <button type="submit" class="submit-btn">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                Submit
-            </button>
+            <!-- Campo para el código de verificación -->
+            {% if messages %}
+                {% for message in messages %}
+                    {% if "código" in message.message %}
+                        <div class="user-box">
+                            <input required="" name="verification_code" type="text">
+                            <label>Verification Code</label>
+                        </div>
+                    {% endif %}
+                    <p class="message {% if message.level_tag == 'success' %}success{% else %}error{% endif %}">
+                        {{ message }}
+                    </p>
+                {% endfor %}
+            {% endif %}
 
+            <button type="submit" class="submit-btn">Submit</button>
         </form>
-        <p>Do you have an account? <a href="{% url 'signin' %}" class="a2">Signin!</a></p>
     </div>
-    
-  
-    <script src="{% static 'js/script.js' %}"></script>
 </body>
 
 </html>
